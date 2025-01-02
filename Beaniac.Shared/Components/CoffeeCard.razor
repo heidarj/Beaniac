@@ -1,0 +1,32 @@
+@using static Beaniac.Shared.Components.BStack
+<FluentCard>
+    <BStack Orientation="Orientation.Vertical"
+                    HorizontalAlignment="HorizontalAlignment.Left"
+                    VerticalAlignment="VerticalAlignmentValue.SpaceBetween"
+                    Height="100%">
+        <BStack Height="100%"
+                     Orientation="Orientation.Vertical"
+                    HorizontalAlignment="HorizontalAlignment.Center"
+                    VerticalAlignment="VerticalAlignmentValue.Center">
+            <img src="@Coffee.ImageUrl" style="max-width: 100%; max-height: 100%;" />
+        </BStack>
+        <BStack Orientation="Orientation.Vertical"
+                    HorizontalAlignment="HorizontalAlignment.Left"
+                    VerticalAlignment="VerticalAlignmentValue.Center"
+                    VerticalGap="5">
+            <h4>@Coffee.Name</h4>
+            <p>@Coffee.Origin</p>
+            <FluentOverflow Style="width: 100%;">
+                @foreach (var item in Coffee.TastingNotes)
+                {
+                    <FluentOverflowItem><FluentBadge>@item</FluentBadge></FluentOverflowItem>
+                }
+            </FluentOverflow>
+        </BStack>
+    </BStack>
+</FluentCard>
+
+@code {
+    [Parameter]
+    public Coffee Coffee { get; set; }
+}

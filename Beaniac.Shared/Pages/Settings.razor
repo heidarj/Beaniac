@@ -1,0 +1,14 @@
+@page "/settings"
+<FluentDesignTheme @bind-Mode="@Mode" StorageName="theme" />
+<PageTitle>Settings</PageTitle>
+<h3>Settings</h3>
+<FluentSwitch ValueChanged="ToggleTheme" Label="Dark mode" Value=@(Mode == DesignThemeModes.Dark) />
+
+@code {
+    DesignThemeModes Mode;
+
+    void ToggleTheme()
+    {
+        Mode = Mode == DesignThemeModes.Dark ? DesignThemeModes.Light : DesignThemeModes.Dark;
+    }
+}

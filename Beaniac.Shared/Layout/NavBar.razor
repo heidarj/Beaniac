@@ -1,0 +1,43 @@
+@{
+    string stylevalue = $"{(Vertical ? " width: 86px; height: var(--reserved-space-left);" : "height: var(--reserved-space);")} padding: 12px; background-color: var(--neutral-layer-1);";
+}
+<div style="@stylevalue">
+    <FluentAppBar Orientation="@(Vertical ? Orientation.Vertical : Orientation.Horizontal)">
+        <FluentAppBarItem Href="/" Match="NavLinkMatch.All" Text="Beans" IconRest="HomeIcon()" IconActive="HomeIcon(active: true)"> 
+            <FluentEmoji Value="@(new Emojis.FoodDrink.HighContrast.Default.Beans())" part="icon-rest" Width="24"/>
+            <FluentEmoji Value="@(new Emojis.FoodDrink.Flat.Default.Beans())" part="icon-active" Width="24" />
+            <div part="label">Beans</div>
+        </FluentAppBarItem>
+        <FluentAppBarItem Href="/AppBar" IconRest="ConsoleLogsIcon()" IconActive="ConsoleLogsIcon(active: true)"
+            Text="Console Logs" />
+        <FluentAppBarItem Href="/StructuredLogs" IconRest="StructuredLogsIcon()"
+            IconActive="StructuredLogsIcon(active: true)" Text="Logs" Tooltip="Structured Logs" Count="4" />
+        <FluentAppBarItem Href="/settings" IconRest="SettingsIcon()" IconActive="SettingsIcon(active: true)" Text="Settings"/>
+    </FluentAppBar>
+</div>
+
+
+@code {
+    [Parameter]
+    public bool Vertical { get; set; } = true;
+
+    private static Icon HomeIcon(bool active = false) =>
+        active ? new Icons.Filled.Size24.Home()
+               : new Icons.Regular.Size24.Home();
+
+    private static Icon ConsoleLogsIcon(bool active = false) =>
+        active ? new Icons.Filled.Size24.SlideText()
+               : new Icons.Regular.Size24.SlideText();
+
+    private static Icon StructuredLogsIcon(bool active = false) =>
+        active ? new Icons.Filled.Size24.SlideTextSparkle()
+               : new Icons.Regular.Size24.SlideTextSparkle();
+
+    private static Icon SettingsIcon(bool active = false) =>
+        active ? new Icons.Filled.Size24.Settings()
+               : new Icons.Regular.Size24.Settings();
+
+    private static Icon MetricsIcon(bool active = false) =>
+        active ? new Icons.Filled.Size24.ChartMultiple()
+               : new Icons.Regular.Size24.ChartMultiple();
+}

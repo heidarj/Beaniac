@@ -1,0 +1,24 @@
+<FluentCard @onclick="OnClickHandlerAsync">
+    <NavLink Href="@Href">
+    <BStack Orientation="Orientation.Vertical" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignmentValue.Center" Height="100%">
+        <FluentIcon Value="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size48.Add())" />
+        <p>Add</p>
+    </BStack>
+    </NavLink>
+</FluentCard>
+
+@code {
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public string? Href { get; set; }
+
+    protected async Task OnClickHandlerAsync(MouseEventArgs ev)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(this);
+        }
+    }
+}
