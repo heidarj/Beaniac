@@ -32,21 +32,27 @@ namespace Beaniac.Shared.Services
             return await _httpClient.GetFromJsonAsync<T>($"{_endpoint}/{id}");
         }
 
-        public async Task AddCoffeeAsync<T>(T item)
+        public async Task<IEnumerable<PopularityResult<T>>?> GetTopAsync<T>()
+        {
+            var _endpoint = typeof(T).Name.ToLower();
+            return await _httpClient.GetFromJsonAsync<IEnumerable<PopularityResult<T>>>($"{_endpoint}/top");
+        }
+
+        public async Task AddAsync<T>(T item)
         {
             var _endpoint = typeof(T).Name.ToLower();
             var response = await _httpClient.PostAsJsonAsync(_endpoint, item);
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task UpdateCoffeeAsync<T>(T item, Guid id)
+        public async Task UpdateAsync<T>(T item, Guid id)
         {
             var _endpoint = typeof(T).Name.ToLower();
             var response = await _httpClient.PutAsJsonAsync($"{_endpoint}/{id}", item);
             response.EnsureSuccessStatusCode();
         }
 
-        public async Task DeleteCoffeeAsync<T>(Guid id)
+        public async Task DeleteAsync<T>(Guid id)
         {
             var _endpoint = typeof(T).Name.ToLower();
             var response = await _httpClient.DeleteAsync($"{_endpoint}/{id}");

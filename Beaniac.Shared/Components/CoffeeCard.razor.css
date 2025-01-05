@@ -1,0 +1,11 @@
+::deep a {
+    text-decoration: none;
+}
+
+::deep h1, ::deep h2, ::deep h3, ::deep h4, ::deep h5, ::deep h6, ::deep p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    text-decoration: none;
+}

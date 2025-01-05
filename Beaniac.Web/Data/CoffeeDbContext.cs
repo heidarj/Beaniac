@@ -10,5 +10,14 @@ public class CoffeeDbContext : DbContext
     {
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Coffee>()
+            .HasMany(e => e.TastingNotes)
+            .WithMany(e => e.Coffees)
+            .UsingEntity<CoffeeTastingNote>();
+    }
+
     public DbSet<Coffee> Coffees { get; set; } = null!;
+    public DbSet<TastingNote> TastingNotes { get; set; } = null!;
 }

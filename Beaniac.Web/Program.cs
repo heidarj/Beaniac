@@ -5,6 +5,7 @@ using Beaniac.Web.Services;
 using Beaniac.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using Beaniac.Shared.Models;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 builder.Services.AddFluentUIComponents();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 // Add device-specific services used by the Beaniac.Shared project
 builder.Services.AddSingleton<IFormFactor, FormFactor>();

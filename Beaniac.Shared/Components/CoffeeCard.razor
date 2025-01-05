@@ -1,5 +1,7 @@
 @using static Beaniac.Shared.Components.BStack
+<span>
 <FluentCard>
+    <NavLink Href=@($"/beans/{Coffee.Id}")>
     <BStack Orientation="Orientation.Vertical"
                     HorizontalAlignment="HorizontalAlignment.Left"
                     VerticalAlignment="VerticalAlignmentValue.SpaceBetween"
@@ -8,7 +10,7 @@
                      Orientation="Orientation.Vertical"
                     HorizontalAlignment="HorizontalAlignment.Center"
                     VerticalAlignment="VerticalAlignmentValue.Center">
-            <img src="@Coffee.ImageUrl" style="max-width: 100%; max-height: 100%;" />
+            <img src="@Coffee.ImageUrl?.FirstOrDefault()" style="max-width: 100%; max-height: 100%;" />
         </BStack>
         <BStack Orientation="Orientation.Vertical"
                     HorizontalAlignment="HorizontalAlignment.Left"
@@ -17,16 +19,17 @@
             <h4>@Coffee.Name</h4>
             <p>@Coffee.Origin</p>
             <FluentOverflow Style="width: 100%;">
-                @foreach (var item in Coffee.TastingNotes)
+                @foreach (var item in Coffee.TastingNotes ?? new List<TastingNote>())
                 {
-                    <FluentOverflowItem><FluentBadge>@item</FluentBadge></FluentOverflowItem>
+                    <FluentOverflowItem><FluentBadge>@item.Name</FluentBadge></FluentOverflowItem>
                 }
             </FluentOverflow>
         </BStack>
     </BStack>
+    </NavLink>
 </FluentCard>
-
+</span>
 @code {
     [Parameter]
-    public Coffee Coffee { get; set; }
+    public required Coffee Coffee { get; set; }
 }

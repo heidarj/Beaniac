@@ -27,7 +27,7 @@ body {
 }
 
 .content {
-    padding: 0.5rem 1.5rem;
+    padding: 1.5rem;
     align-self: stretch !important;
     width: 100%;
 }
@@ -113,7 +113,7 @@ code {
     background-color: var(--accent-base-color) !important;
 }
 
-div.fluent-appbar-item path {
+div.fluent-appbar-item path, .theme-fill path {
     fill: var(--neutral-foreground-rest);
 }
 

@@ -1,5 +1,4 @@
 ﻿@page "/"
-@using Beaniac.Shared.Services
 @inject RestService RestService
 
 <PageTitle>Home</PageTitle>
@@ -18,13 +17,21 @@
     </CompletedTemplate>
 
     <ChildContent>
-        <FluentGrid Justify="JustifyContent.FlexStart">
+        <FluentGrid Justify="JustifyContent.FlexStart" Spacing="2">
             <FluentGridItem xs="12" sm="6" md="3" lg="2">
-                <AddCard Href="/settings" />
+                <AddCard Href="/coffee/add" />
             </FluentGridItem>
         @foreach (var coffee in Coffees){
             <FluentGridItem xs="12" sm="6" md="3" lg="2">
                 <CoffeeCard coffee=coffee ></CoffeeCard>
+            </FluentGridItem>
+        }
+        @if(Coffees is null or {Count: 0}){
+            <FluentGridItem sm="6" md="9" lg="10">
+                <FluentCard >
+                    <h4>Welcome to Beaniac</h4>
+                    <p>Get started by adding your first beans <span class="theme-fill"><FluentEmoji Value="@(new Emojis.FoodDrink.HighContrast.Default.Beans())" part="icon-rest" Width="24"/></span></p>
+                </FluentCard>
             </FluentGridItem>
         }
         </FluentGrid>

@@ -1,0 +1,115 @@
+<div class="fluent-inputfile-container">
+
+    <div class="inputfile-content">
+
+        <label for="@Id">
+            <FluentIcon Value="@(new @Icons.Regular.Size24.ArrowUpload())" />
+        </label>
+
+        <div>
+            <label for="@Id">Select photos to upload</label>
+            <br />
+            <em>Maximum of 4 photos allowed.</em>
+        </div>
+
+        <div class="inputfile-progress" style=@($"visibility: {(ProgressPercent > 0 ? "visible" : "hidden")};")>
+            <FluentProgress Min="0" Max="100" Value="@ProgressPercent" /><br />
+            @ProgressTitle
+        </div>
+            
+    </div>
+
+    <div style="grid-column: 1; grid-row: 1; ">
+        <InputFile OnChange="LoadFiles"
+                id="@Id"
+                multiple=@Multiple
+                accept="@Accept"/>
+    </div>
+</div>
+
+@foreach (var file in Files)
+{
+    <FluentBadge Appearance="Appearance.Neutral" OnDismissClick="@(async () => await DismissFile(file))" >@file.Name</FluentBadge>
+}
+
+@code {
+    [Parameter] public required string Id { get; set; } = string.Empty;
+    [Parameter] public bool Multiple { get; set; } = true;
+    [Parameter] public string Accept { get; set; } = "image/*";
+    public int ProgressPercent { get; set; } = 0;
+    public string ProgressTitle { get; set; } = string.Empty;
+    [Parameter]
+    public List<IBrowserFile> Files { get; set; } = new List<IBrowserFile>();
+    private List<IBrowserFile> Resizediles = new List<IBrowserFile>();
+    [Parameter]
+    public EventCallback<List<IBrowserFile>> FilesChanged { get; set; }
+    private int maxAllowedFiles = 4;
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        await UpdateProgressAsync(0, "Loading...");
+        Files.Clear();
+
+        var fileNumber = 0;
+
+        var files = e.GetMultipleFiles(maxAllowedFiles);
+
+        foreach (var file in files)
+        {
+            var title = string.Format("Loading {0}/{1} - {2}", fileNumber + 1, files.Count, file.Name) ?? string.Empty;
+            try
+            {
+                Files.Add(file);
+                Resizediles.Add(await file.RequestImageFileAsync("image/png", 300, 300));
+            }
+            catch (Exception ex)
+            {
+                await UpdateProgressAsync(100, "Failed");
+                Console.WriteLine("File: {FileName} Error: {Error}", 
+                    file.Name, ex.Message);
+            }
+        }
+        if (FilesChanged.HasDelegate)
+        {
+            await FilesChanged.InvokeAsync(Files);
+        }
+        await UpdateProgressAsync(100, "Completed");
+    }
+
+    private Task UpdateProgressAsync(long current, long size, string title)
+    {
+        return UpdateProgressAsync(Convert.ToInt32(decimal.Divide(current, size) * 100), title);
+    }
+
+    private async Task UpdateProgressAsync(int percent, string title)
+    {
+        if (ProgressPercent != percent)
+        {
+            ProgressPercent = percent;
+        }
+
+        if (ProgressTitle != title)
+        {
+            ProgressTitle = title;
+        }
+        await Task.CompletedTask;
+    }
+
+    private async Task DismissFile(IBrowserFile file)
+    {
+        await UpdateProgressAsync(0, "Removing...");
+        Files.Remove(file);
+        if (FilesChanged.HasDelegate)
+        {
+            await FilesChanged.InvokeAsync(Files);
+        }
+        if (Files.Count == 0)
+        {
+            await UpdateProgressAsync(0, string.Empty);
+        }
+        else
+        {
+            await UpdateProgressAsync(100, "Completed");
+        }
+    }
+}

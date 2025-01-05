@@ -33,7 +33,7 @@ namespace Beaniac.Web.Controllers
         {
             var coffeeSet = _context.Coffees.AsNoTracking();
             var TotalCount = await coffeeSet.CountAsync();
-            var coffees = await coffeeSet
+            var coffees = await coffeeSet.Include(c => c.TastingNotes)
                                     .Skip((pageNumber - 1) * pageSize)
                                     .Take(pageSize)
                                     .ToListAsync();

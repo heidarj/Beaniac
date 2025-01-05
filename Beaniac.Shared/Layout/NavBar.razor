@@ -8,14 +8,11 @@
             <FluentEmoji Value="@(new Emojis.FoodDrink.Flat.Default.Beans())" part="icon-active" Width="24" />
             <div part="label">Beans</div>
         </FluentAppBarItem>
-        <FluentAppBarItem Href="/AppBar" IconRest="ConsoleLogsIcon()" IconActive="ConsoleLogsIcon(active: true)"
-            Text="Console Logs" />
-        <FluentAppBarItem Href="/StructuredLogs" IconRest="StructuredLogsIcon()"
-            IconActive="StructuredLogsIcon(active: true)" Text="Logs" Tooltip="Structured Logs" Count="4" />
+        <FluentAppBarItem Href="/AppBar" IconRest="CoffeeIcon()" IconActive="CoffeeIcon(active: true)"
+            Text="Brews" />
         <FluentAppBarItem Href="/settings" IconRest="SettingsIcon()" IconActive="SettingsIcon(active: true)" Text="Settings"/>
     </FluentAppBar>
 </div>
-
 
 @code {
     [Parameter]
@@ -25,9 +22,9 @@
         active ? new Icons.Filled.Size24.Home()
                : new Icons.Regular.Size24.Home();
 
-    private static Icon ConsoleLogsIcon(bool active = false) =>
-        active ? new Icons.Filled.Size24.SlideText()
-               : new Icons.Regular.Size24.SlideText();
+    private static Icon CoffeeIcon(bool active = false) =>
+        active ? new Icons.Filled.Size24.DrinkCoffee()
+               : new Icons.Regular.Size24.DrinkCoffee();
 
     private static Icon StructuredLogsIcon(bool active = false) =>
         active ? new Icons.Filled.Size24.SlideTextSparkle()
