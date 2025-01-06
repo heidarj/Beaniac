@@ -51,7 +51,10 @@ namespace Beaniac.Web.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<Coffee>> GetCoffee(Guid id)
         {
-            var coffee = await _context.Coffees.FindAsync(id);
+            var coffee = await _context.Coffees
+                                        .Include(x => x.TastingNotes)
+                                        .Include(x => x.Brews)
+                                        .FirstOrDefaultAsync(x => x.Id == id);
 
             if (coffee == null)
             {

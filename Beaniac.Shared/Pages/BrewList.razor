@@ -1,0 +1,39 @@
+@page "/brew"
+@inject RestService RestService
+
+<PageTitle>Brews</PageTitle>
+
+<PullGrid TItem="Brew" Items=@Brews OnRefreshAsync=@(() => RefreshBrews(true))>
+    <NoImageContent>
+        <FluentIcon Value="@(new Icons.Filled.Size24.DrinkCoffee())" Width="100%"/>
+    </NoImageContent>
+    <CardExtraContent>
+        @if(context.Rating is int rating and >= 0 and <= 5)
+        {
+            <FluentRating Max="5" Value="@rating" ReadOnly=true/>
+        }
+    </CardExtraContent>
+</PullGrid>
+
+@code {
+    List<Brew> Brews = new List<Brew>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshBrews(false);
+    }
+
+    async Task<bool> RefreshBrews(bool forceRefresh)
+    {
+        var Result = await RestService.GetAsync<Brew>(forceRefresh);
+        Brews = Result ?? new List<Brew>();
+        var brewTasks = Brews.Select(async b => {
+            b.Coffee = await RestService.GetByIdAsync<Coffee>(b.CoffeeId);
+            return b;
+        });
+
+        Brews = (await Task.WhenAll(brewTasks)).ToList();
+
+        return true;
+    }
+}

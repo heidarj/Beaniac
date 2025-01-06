@@ -1,7 +1,9 @@
-@using static Beaniac.Shared.Components.BStack
+@typeparam TItem where TItem : IDisplayItem
+
+@if(Item is TItem){
 <span>
 <FluentCard>
-    <NavLink Href=@($"/beans/{Coffee.Id}")>
+    <NavLink Href=@($"/{typeof(TItem).Name.ToLowerInvariant()}/{Item.Id}")>
     <BStack Orientation="Orientation.Vertical"
                     HorizontalAlignment="HorizontalAlignment.Left"
                     VerticalAlignment="VerticalAlignmentValue.SpaceBetween"
@@ -10,26 +12,34 @@
                      Orientation="Orientation.Vertical"
                     HorizontalAlignment="HorizontalAlignment.Center"
                     VerticalAlignment="VerticalAlignmentValue.Center">
-            <img src="@Coffee.ImageUrl?.FirstOrDefault()" style="max-width: 100%; max-height: 100%;" />
+            @if(!string.IsNullOrWhiteSpace(Item.ImageUrl?.FirstOrDefault()))
+            {
+                <img src="@Item.ImageUrl?.FirstOrDefault()" style="max-width: 100%; max-height: 100%;" />
+            }
+            else
+            {
+                @NoImageContent
+            }
         </BStack>
         <BStack Orientation="Orientation.Vertical"
                     HorizontalAlignment="HorizontalAlignment.Left"
                     VerticalAlignment="VerticalAlignmentValue.Center"
                     VerticalGap="5">
-            <h4>@Coffee.Name</h4>
-            <p>@Coffee.Origin</p>
-            <FluentOverflow Style="width: 100%;">
-                @foreach (var item in Coffee.TastingNotes ?? new List<TastingNote>())
-                {
-                    <FluentOverflowItem><FluentBadge>@item.Name</FluentBadge></FluentOverflowItem>
-                }
-            </FluentOverflow>
+            <h4>@Item.Name</h4>
+            @ItemTemplate(Item)
         </BStack>
     </BStack>
     </NavLink>
 </FluentCard>
 </span>
+}
+
 @code {
     [Parameter]
-    public required Coffee Coffee { get; set; }
+    public required TItem Item { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem> ItemTemplate { get; set; } = default!;
+    [Parameter]
+    public RenderFragment NoImageContent { get; set; } = default!;
 }

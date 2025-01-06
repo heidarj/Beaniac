@@ -89,6 +89,7 @@
     async Task OnFinishedAsync()
     {
         Console.WriteLine("Finished");
+        await Task.CompletedTask;
     }
 
     async Task OnValidSubmit()

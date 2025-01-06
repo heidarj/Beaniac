@@ -16,8 +16,14 @@ public class CoffeeDbContext : DbContext
             .HasMany(e => e.TastingNotes)
             .WithMany(e => e.Coffees)
             .UsingEntity<CoffeeTastingNote>();
+        
+        modelBuilder.Entity<Brew>()
+            .HasOne(e => e.Coffee)
+            .WithMany(e => e.Brews)
+            .HasForeignKey(e => e.CoffeeId);
     }
 
     public DbSet<Coffee> Coffees { get; set; } = null!;
     public DbSet<TastingNote> TastingNotes { get; set; } = null!;
+    public DbSet<Brew> Brews { get; set; } = null!;
 }

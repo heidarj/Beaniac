@@ -1,0 +1,58 @@
+@inject RestService RestService
+@typeparam TItem where TItem : IDisplayItem
+
+<FluentPullToRefresh Direction="@PullDirection.Down"
+                     OnRefreshAsync="OnRefreshAsync!"
+                     ShowStaticTip="false">
+    <PullingTemplate>
+        Pull to refresh
+    </PullingTemplate>
+    <ReleaseTemplate>
+        Release to update
+    </ReleaseTemplate>
+    <CompletedTemplate>
+        Update completed
+    </CompletedTemplate>
+
+    <ChildContent>
+        <FluentGrid Justify="JustifyContent.FlexStart" Spacing="2">
+            <FluentGridItem xs="12" sm="6" md="3" lg="2">
+                <AddCard Href=@($"/{Typename}/add") />
+            </FluentGridItem>
+        @foreach (var item in Items){
+            <FluentGridItem xs="12" sm="6" md="3" lg="2">
+                <DisplayCard Item=item TItem="TItem" >
+                    <NoImageContent>
+                        @NoImageContent
+                    </NoImageContent>
+                    <ItemTemplate>
+                        @CardExtraContent(item)
+                    </ItemTemplate>
+                </DisplayCard>
+            </FluentGridItem>
+        }
+        @if(Items is null or {Count: 0}){
+            <FluentGridItem sm="6" md="9" lg="10">
+                <FluentCard >
+                    <h4>Welcome to Beaniac</h4>
+                    <p>Get started by adding your first @Typename <span class="theme-fill"><FluentEmoji Value="@(new Emojis.FoodDrink.HighContrast.Default.Beans())" part="icon-rest" Width="24"/></span></p>
+                </FluentCard>
+            </FluentGridItem>
+        }
+        </FluentGrid>
+    </ChildContent>
+</FluentPullToRefresh>
+
+@code {
+    [Parameter]
+    public RenderFragment<TItem> CardExtraContent { get; set; } = default!;
+    [Parameter]
+    public RenderFragment NoImageContent { get; set; } = default!;
+    [Parameter]
+    public List<TItem> Items { get; set; } = new List<TItem>();
+    [Parameter]
+    public EventCallback<List<TItem>> ItemsChanged { get; set; }
+    [Parameter]
+    public Func<Task<bool>>? OnRefreshAsync { get; set; }
+    string Typename = typeof(TItem).Name.ToLowerInvariant();
+}

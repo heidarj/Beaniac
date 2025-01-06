@@ -27,13 +27,10 @@ public class TastingNoteController : ControllerBase
         var coffeeSet = _context.TastingNotes.AsNoTracking();
         var result = coffeeSet.Select(t => new PopularityResult<TastingNote>
         {
-            Item = t,                      // the Tag
-            Count = t.Coffees.Count()    // just count the number of artices
-                                        // the tag is used in
+            Item = t,                      // the tasting note
+            Count = t.Coffees.Count()    // the number of coffees with this tasting note
         })
-        .OrderByDescending(x => x.Count);
-
-        Console.WriteLine(result.ToQueryString());
+        .OrderByDescending(x => x.Count).Take(50);
 
         return result;
     }

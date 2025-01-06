@@ -3,55 +3,37 @@
 
 <PageTitle>Home</PageTitle>
 
-<FluentPullToRefresh Direction="@PullDirection.Down"
-                     OnRefreshAsync="OnRefreshAsync"
-                     ShowStaticTip="false">
-    <PullingTemplate>
-        Pull to refresh
-    </PullingTemplate>
-    <ReleaseTemplate>
-        Release to update
-    </ReleaseTemplate>
-    <CompletedTemplate>
-        Update completed
-    </CompletedTemplate>
-
-    <ChildContent>
-        <FluentGrid Justify="JustifyContent.FlexStart" Spacing="2">
-            <FluentGridItem xs="12" sm="6" md="3" lg="2">
-                <AddCard Href="/coffee/add" />
-            </FluentGridItem>
-        @foreach (var coffee in Coffees){
-            <FluentGridItem xs="12" sm="6" md="3" lg="2">
-                <CoffeeCard coffee=coffee ></CoffeeCard>
-            </FluentGridItem>
-        }
-        @if(Coffees is null or {Count: 0}){
-            <FluentGridItem sm="6" md="9" lg="10">
-                <FluentCard >
-                    <h4>Welcome to Beaniac</h4>
-                    <p>Get started by adding your first beans <span class="theme-fill"><FluentEmoji Value="@(new Emojis.FoodDrink.HighContrast.Default.Beans())" part="icon-rest" Width="24"/></span></p>
-                </FluentCard>
-            </FluentGridItem>
-        }
-        </FluentGrid>
-    </ChildContent>
-</FluentPullToRefresh>
+<PullGrid @bind-Items="Coffees" OnRefreshAsync="@(() => Refresh(true))">
+    <NoImageContent>
+        <FluentEmoji Value="@(new Emojis.FoodDrink.HighContrast.Default.Beans())" part="icon-rest" Width="100%"/>
+    </NoImageContent>
+    <CardExtraContent>
+        <p>@context.Origin</p>
+        <FluentOverflow Style="width: 100%;">
+            @if (context.TastingNotes is IEnumerable<TastingNote>)
+            {
+                @foreach (var item in context.TastingNotes)
+                {
+                    <FluentOverflowItem><FluentBadge>@item.Name</FluentBadge></FluentOverflowItem>
+                }
+            }
+        </FluentOverflow>
+    </CardExtraContent>
+</PullGrid>
 
 @code {
-    private List<Coffee> Coffees = new List<Coffee>();
+    List<Coffee> Coffees = new List<Coffee>();
 
     protected override async Task OnInitializedAsync()
     {
-        var CoffeeResult = await RestService.GetAsync<Coffee>();
-        Coffees = CoffeeResult?.Items ?? new List<Coffee>();
+        await Refresh(false);
     }
 
-    async Task<bool> OnRefreshAsync()
+    async Task<bool> Refresh(bool forceRefresh)
     {
-        var CoffeeResult = await RestService.GetAsync<Coffee>();
-        Coffees = CoffeeResult?.Items ?? new List<Coffee>();
-        await Task.Delay(500);
+        var Result = await RestService.GetAsync<Coffee>(forceRefresh);
+        Coffees = Result ?? new List<Coffee>();
+
         return true;
     }
 }

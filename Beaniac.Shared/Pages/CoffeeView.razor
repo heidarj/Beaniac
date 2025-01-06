@@ -1,0 +1,64 @@
+@page "/coffee/{Id:guid}"
+@inject RestService RestService
+
+@if(Coffee is null){
+    <h1>Not found</h1>
+    <p>The coffee you are looking for does not exist</p>
+}
+else {
+<FluentGrid>
+    <FluentGridItem xs="12" sm="6" md="3">
+        <h2>@Coffee.Name</h2>
+        @if(!string.IsNullOrWhiteSpace(Coffee.ImageUrl?.FirstOrDefault()))
+        {
+            <img src="@Coffee.ImageUrl?.FirstOrDefault()" style="max-width: 100%; max-height: 100%;" />
+        }
+        <p>@Coffee.Origin</p>
+        <p>@Coffee.OtherNotes</p>
+        <FluentOverflow Style="width: 100%;">
+            @if (Coffee.TastingNotes is IEnumerable<TastingNote>)
+            {
+                @foreach (var item in Coffee.TastingNotes)
+                {
+                    <FluentOverflowItem><FluentBadge Appearance="Appearance.Accent">@item.Name</FluentBadge></FluentOverflowItem>
+                }
+            }
+        </FluentOverflow>
+
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6" md="9">
+        @if(Coffee.Brews is List<Brew>)
+        {
+        <h3>Brews with this coffee</h3>
+        <PullGrid TItem="Brew" Items=@Coffee.Brews?.ToList() OnRefreshAsync=@Refresh>
+            <NoImageContent>
+                <FluentIcon Value="@(new Icons.Filled.Size24.DrinkCoffee())" Width="100%"/>
+            </NoImageContent>
+            <CardExtraContent>
+                @if(context.Rating is int rating and >= 0 and <= 5)
+                {
+                    <FluentRating Max="5" Value="@rating" ReadOnly=true/>
+                }
+            </CardExtraContent>
+        </PullGrid>
+        }
+    </FluentGridItem>
+</FluentGrid>
+}
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    Coffee? Coffee;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Coffee = await RestService.GetByIdAsync<Coffee>(Id, skipCache: true);
+    }
+
+    async Task<bool> Refresh()
+    {
+        Coffee = await RestService.GetByIdAsync<Coffee>(Id, skipCache: true);
+        return true;
+    }
+}

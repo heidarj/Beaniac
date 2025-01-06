@@ -3,15 +3,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Beaniac.Shared.Models;
 
-public class Coffee
+public class Coffee : IDisplayItem
 {
     public Guid? Id { get; set; }
     public required string Name { get; set; }
     public string? RoastLevel { get; set; }
-    public List<string>? ImageUrl { get; set; }
+    public ICollection<string>? ImageUrl { get; set; }
     public string? Origin { get; set; }
     public ICollection<TastingNote>? TastingNotes { get; set; }
-    public ICollection<CoffeeTastingNote>? CoffeeTastingNotes { get; set; }
+    public ICollection<Brew>? Brews { get; set; }
     public string? ProcessingMethod { get; set; }
     public string? Roaster { get; set; }
     public DateTime? RoastedDate { get; set; }
@@ -25,8 +25,6 @@ public class Coffee
 }
 
 public class CoffeeTastingNote {
-    public Guid CoffeeId { get; set; }
     public required Coffee Coffee { get; set; }
-    public Guid TastingNoteId { get; set; }
     public required TastingNote TastingNote { get; set; }
 }
