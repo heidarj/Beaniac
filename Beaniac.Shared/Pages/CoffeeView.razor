@@ -15,6 +15,12 @@ else {
         }
         <p>@Coffee.Origin</p>
         <p>@Coffee.OtherNotes</p>
+        <p>Roast Level: @Coffee.RoastLevel</p>
+        <p>Processing Method: @Coffee.ProcessingMethod</p>
+        <p>Roaster: @Coffee.Roaster</p>
+        <p>Roasted Date: @Coffee.RoastedDate?.ToString("MMMM dd, yyyy")</p>
+        <p>Submitted on: @Coffee.CreatedDate.ToString("MMMM dd, yyyy")</p>
+        <p>Last updated on: @Coffee.UpdatedDate.ToString("MMMM dd, yyyy")</p>
         <FluentOverflow Style="width: 100%;">
             @if (Coffee.TastingNotes is IEnumerable<TastingNote>)
             {
