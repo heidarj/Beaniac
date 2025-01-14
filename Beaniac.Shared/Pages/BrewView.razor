@@ -1,0 +1,52 @@
+@page "/brew/{Id:guid}"
+@inject RestService RestService
+
+@if(Brew is null){
+    <h1>Not found</h1>
+    <p>The brew you are looking for does not exist</p>
+}
+else {
+<FluentGrid>
+    <FluentGridItem xs="12" sm="6" md="3">
+        <h2>@Brew.Coffee?.Name</h2>
+        @if(Brew.ImageUrl?.Any() == true)
+        {
+            <ImageGallery Images="Brew.ImageUrl.ToList()" />
+        }
+        <p>Brew Method: @Brew.BrewMethod</p>
+        <p>Grind Size: @Brew.GrindSize</p>
+        <p>Grams In: @Brew.GramsIn</p>
+        <p>Coffee Out: @Brew.CoffeeOut</p>
+        <p>Brew Time: @Brew.BrewTime?.ToString("c")</p>
+        <p>Rating: @Brew.Rating</p>
+        <p>Brew Date: @Brew.BrewDate.ToString("MMMM dd, yyyy")</p>
+        <p>Notes: @Brew.Notes</p>
+        <FluentOverflow Style="width: 100%;">
+            @if (Brew.TastingNotes is IEnumerable<TastingNote>)
+            {
+                @foreach (var item in Brew.TastingNotes)
+                {
+                    <FluentOverflowItem><FluentBadge Appearance="Appearance.Accent">@item.Name</FluentBadge></FluentOverflowItem>
+                }
+            }
+        </FluentOverflow>
+    </FluentGridItem>
+    <FluentGridItem xs="12" sm="6" md="9">
+        @if(Brew.Coffee is Coffee coffee)
+        {
+            <DisplayCard Item="coffee" TItem="Coffee" />
+        }
+    </FluentGridItem>
+</FluentGrid>
+}
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    Brew? Brew;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Brew = await RestService.GetByIdAsync<Brew>(Id, skipCache: true);
+    }
+}
