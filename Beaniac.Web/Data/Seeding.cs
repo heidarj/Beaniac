@@ -124,7 +124,7 @@ public static class SeedData
             Rating = 5,
             BrewDate = new DateTime(2025, 1, 1),
             Notes = "This coffee is amazing!",
-            ImageUrl = ["https://coffeegeek.com/wp-content/uploads/2021/02/mythsespresso2.jpg"]
+            ImageUrl = ["https://coffeegeek.com/wp-content/uploads/2021/02/mythsespresso2.jpg", "https://kaffibrugghusid.is/cdn/shop/products/Brasiliapaubrasilminnkud_1080x.jpg?v=1622135695"]
         },
         new Brew
         {
