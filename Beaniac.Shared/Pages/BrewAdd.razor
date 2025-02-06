@@ -28,11 +28,11 @@
                 <DataAnnotationsValidator />
                 <FluentStack Orientation="Orientation.Vertical">
                     <FluentTextField @bind-Value="Brew.BrewMethod" Label="Brew Method" style="width: 100%;" />
-                    <FluentTextField @bind-Value="Brew.GrindSize" Label="Grind Size" style="width: 100%;" />
-                    <FluentTextField @bind-Value="Brew.GramsIn" Label="Grams In" style="width: 100%;" />
-                    <FluentTextField @bind-Value="Brew.CoffeeOut" Label="Coffee Out" style="width: 100%;" />
-                    <FluentTextField @bind-Value="Brew.BrewTime" Label="Brew Time" style="width: 100%;" />
-                    <FluentTextField @bind-Value="Brew.Rating" Label="Rating" style="width: 100%;" />
+                    <FluentNumberField @bind-Value="Brew.GrindSize" Label="Grind Size" style="width: 100%;" />
+                    <FluentNumberField @bind-Value="Brew.GramsIn" Label="Grams In" style="width: 100%;" />
+                    <FluentNumberField @bind-Value="Brew.CoffeeOut" Label="Coffee Out" style="width: 100%;" />
+                    <FluentNumberField @bind-Value="Brew.BrewTime" Label="Brew Time" style="width: 100%;" />
+                    <FluentNumberField @bind-Value="Brew.Rating" Label="Rating" style="width: 100%;" />
                     <FluentDatePicker @bind-Value="Brew.BrewDate" Label="Brew Date" style="width: 100%;" />
                     <FluentAutocomplete @bind-SelectedOptions="selectedTastingNotes"  OnOptionsSearch="@(EventCallback.Factory.Create<OptionsSearchEventArgs<TastingNote>>(this, OnOptionsSearch))" OptionText="@(i => i.Name)" Label="Tasting notes" style="width: 100%;" />
                     <FluentTextArea @bind-Value="Brew.Notes" Label="Notes" style="width: 100%;" />
