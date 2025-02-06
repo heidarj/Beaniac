@@ -74,11 +74,12 @@ namespace Beaniac.Shared.Services
             return await _httpClient.GetFromJsonAsync<IEnumerable<PopularityResult<T>>>($"{_endpoint}/top");
         }
 
-        public async Task AddAsync<T>(T item)
+        public async Task<T?> AddAsync<T>(T item)
         {
             var _endpoint = typeof(T).Name.ToLower();
             var response = await _httpClient.PostAsJsonAsync(_endpoint, item);
             response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<T>();
         }
 
         public async Task UpdateAsync<T>(T item, Guid id)

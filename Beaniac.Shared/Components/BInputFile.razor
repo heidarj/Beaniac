@@ -48,15 +48,15 @@
     private async Task LoadFiles(InputFileChangeEventArgs e)
     {
         await UpdateProgressAsync(0, "Loading...");
-        Files.Clear();
 
         var fileNumber = 0;
 
-        var files = e.GetMultipleFiles(maxAllowedFiles);
+        var files = e.GetMultipleFiles(maxAllowedFiles - Files.Count);
 
         foreach (var file in files)
         {
-            var title = string.Format("Loading {0}/{1} - {2}", fileNumber + 1, files.Count, file.Name) ?? string.Empty;
+            var title = string.Format("Loading {0}/{1} - {2}", (Files.Count + fileNumber + 1), maxAllowedFiles, file.Name) ?? string.Empty;
+            await UpdateProgressAsync((fileNumber + 1) * 100 / files.Count, title);
             try
             {
                 Files.Add(file);
@@ -68,6 +68,7 @@
                 Console.WriteLine("File: {FileName} Error: {Error}", 
                     file.Name, ex.Message);
             }
+            fileNumber++;
         }
         if (FilesChanged.HasDelegate)
         {

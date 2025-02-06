@@ -98,6 +98,16 @@ namespace Beaniac.Web.Controllers
         [HttpPost]
         public async Task<ActionResult<Coffee>> PostCoffee(Coffee coffee)
         {
+            var existingTastingNotes = await _context.TastingNotes
+                .Where(tn => coffee.TastingNotes.Select(ctn => ctn.Name).Contains(tn.Name))
+                .ToListAsync();
+
+            var newTastingNotes = coffee.TastingNotes
+                .Where(ctn => !existingTastingNotes.Select(tn => tn.Name).Contains(ctn.Name))
+                .ToList();
+
+            coffee.TastingNotes = existingTastingNotes.Concat(newTastingNotes).ToList();
+
             _context.Coffees.Add(coffee);
             await _context.SaveChangesAsync();
 
