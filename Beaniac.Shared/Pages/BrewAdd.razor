@@ -1,0 +1,131 @@
+@using System.ComponentModel.DataAnnotations
+@page "/brew/add"
+@inject RestService _restService
+@inject NavigationManager _navigationManager
+
+<FluentWizard StepperPosition="StepperPosition.Top"
+              StepSequence="@WizardStepSequence.Visited"
+              DisplayStepNumber="@(WizardStepStatus.Current | WizardStepStatus.Next)"
+              Border="WizardBorder.Outside"
+              StepTitleHiddenWhen="@GridItemHidden.XsAndDown"
+              Height="100%"
+              Style="min-height: 300px;"
+              OnFinish="@OnFinishedAsync">
+    <Steps>
+        <FluentWizardStep Label="Photo Upload" OnChange="@OnStepChange">
+            <FluentEditForm Model="_photoForm" FormName="addressInfo" OnValidSubmit="OnValidSubmitPhotos" OnInvalidSubmit="OnInvalidSubmit">
+                <h4>Upload photos</h4>
+                <p>Upload up to 4 photos of your brew for automatic detection with AI<FluentIcon Value="@(new Icons.Regular.Size20.Sparkle())" /></p>
+                <BInputFile @bind-Files=@_photoForm.Files Id="photo-input" />
+            </FluentEditForm>
+        </FluentWizardStep>
+
+        <FluentWizardStep Label="AI" Disabled=@(_photoForm.Files.Count == 0) IconPrevious="@(new Icons.Filled.Size24.Sparkle())" IconCurrent="@(new Icons.Filled.Size24.Sparkle())" IconNext="@(new Icons.Regular.Size24.Sparkle())">
+        </FluentWizardStep>
+
+        <FluentWizardStep Label="Details" OnChange="@OnStepChange" >
+            <FluentEditForm Model="Brew" FormName="BrewForm" OnValidSubmit="OnValidSubmit" OnInvalidSubmit="OnInvalidSubmit">
+                <DataAnnotationsValidator />
+                <FluentStack Orientation="Orientation.Vertical">
+                    <FluentTextField @bind-Value="Brew.BrewMethod" Label="Brew Method" style="width: 100%;" />
+                    <FluentNumberField @bind-Value="Brew.GrindSize" Label="Grind Size" style="width: 100%;" />
+                    <FluentNumberField @bind-Value="Brew.GramsIn" Label="Grams In" style="width: 100%;" />
+                    <FluentNumberField @bind-Value="Brew.CoffeeOut" Label="Coffee Out" style="width: 100%;" />
+                    <FluentNumberField @bind-Value="Brew.BrewTime" Label="Brew Time" style="width: 100%;" />
+                    <FluentNumberField @bind-Value="Brew.Rating" Label="Rating" style="width: 100%;" />
+                    <FluentDatePicker @bind-Value="Brew.BrewDate" Label="Brew Date" style="width: 100%;" />
+                    <FluentAutocomplete @bind-SelectedOptions="selectedTastingNotes"  OnOptionsSearch="@(EventCallback.Factory.Create<OptionsSearchEventArgs<TastingNote>>(this, OnOptionsSearch))" OptionText="@(i => i.Name)" Label="Tasting notes" style="width: 100%;" />
+                    <FluentTextArea @bind-Value="Brew.Notes" Label="Notes" style="width: 100%;" />
+                </FluentStack>
+                <FluentValidationSummary style="color:darkred" />
+            </FluentEditForm>
+        </FluentWizardStep>
+    </Steps>
+</FluentWizard>
+
+<FluentOverlay @bind-Visible=@_overlayIsVisible
+               Opacity="0.4"
+               Alignment="Align.Center"
+               Justification="@JustifyContent.Center"
+               Dismissable="false"
+               FullScreen="true"
+               PreventScroll=true>
+    <FluentProgressRing />
+</FluentOverlay>
+
+@code
+{
+    private Brew Brew = new Brew() {Id = Guid.NewGuid()};
+    private PhotoForm _photoForm = new PhotoForm();
+    private bool _overlayIsVisible = false;
+
+    private List<TastingNote> tastingNotes = new List<TastingNote>();
+    private IEnumerable<TastingNote> selectedTastingNotes = new List<TastingNote>();
+
+    override protected async Task OnInitializedAsync() {
+        var results = await _restService.GetTopAsync<TastingNote>();
+        
+        tastingNotes = results?.Select(x => x.Item!).ToList() ?? new List<TastingNote>();
+    }
+
+    void OnOptionsSearch(OptionsSearchEventArgs<TastingNote> e)
+    {
+        
+        var targets = tastingNotes
+                    .Where(x => 
+                        x.Name.Contains(e.Text, StringComparison.OrdinalIgnoreCase) || 
+                        (x.Description is string && x.Description.Contains(e.Text, StringComparison.OrdinalIgnoreCase))
+                    )
+                    .Where(x => !Brew.TastingNotes?.Contains(x) ?? true)
+                    .ToList();
+        if (!string.IsNullOrWhiteSpace(e.Text) && !selectedTastingNotes.Any(x => x.Name.Equals(e.Text, StringComparison.OrdinalIgnoreCase)))
+            targets.Add(new TastingNote { Name = e.Text.ToLower() });
+        e.Items = targets;
+    }
+
+    void OnStepChange(FluentWizardStepChangeEventArgs e)
+    {
+        Console.WriteLine($"Go to step {e.TargetLabel} (#{e.TargetIndex})");
+    }
+
+    async Task OnFinishedAsync()
+    {
+        Console.WriteLine("Finished");
+        var returnedBrew = await _restService.AddAsync(Brew);
+        _navigationManager.NavigateTo($"/brew/{returnedBrew.Id}");
+    }
+
+    async Task OnValidSubmit()
+    {
+        Console.WriteLine($"OnValidSubmit called");
+
+        Brew.TastingNotes = selectedTastingNotes.ToList();
+
+        _overlayIsVisible = true;
+        await Task.Delay(2000);
+        _overlayIsVisible = false;
+    }
+
+    async Task OnValidSubmitPhotos()
+    {
+        Console.WriteLine($"OnValidSubmit called, {_photoForm.Files.Count} photos uploaded");
+
+        StateHasChanged();
+
+        _overlayIsVisible = true;
+        await Task.Delay(2000);
+        _overlayIsVisible = false;
+    }
+
+    void OnInvalidSubmit()
+    {
+        Console.WriteLine($"OnInvalidSubmit called");
+    }
+
+    private class PhotoForm
+    {
+        [Required]
+        [MaxLength(4)]
+        public List<IBrowserFile> Files { get; set; } = new List<IBrowserFile>();
+    }
+}

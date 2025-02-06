@@ -86,7 +86,17 @@ public class BrewController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Brew>> Post(Brew brew)
     {
-        _context.Add(brew);
+        var existingTastingNotes = await _context.TastingNotes
+            .Where(tn => brew.TastingNotes.Select(btn => btn.Name).Contains(tn.Name))
+            .ToListAsync();
+
+        var newTastingNotes = brew.TastingNotes
+            .Where(btn => !existingTastingNotes.Select(tn => tn.Name).Contains(btn.Name))
+            .ToList();
+
+        brew.TastingNotes = existingTastingNotes.Concat(newTastingNotes).ToList();
+
+        _context.Brews.Add(brew);
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(nameof(Get), new { id = brew.Id }, brew);
