@@ -95,5 +95,10 @@ namespace Beaniac.Shared.Services
             var response = await _httpClient.DeleteAsync($"{_endpoint}/{id}");
             response.EnsureSuccessStatusCode();
         }
+
+        public async Task Seed()
+        {
+            await _httpClient.GetAsync("coffee/ensurecreated");
+        }
     }
 }
