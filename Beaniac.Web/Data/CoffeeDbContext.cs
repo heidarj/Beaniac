@@ -21,6 +21,10 @@ public class CoffeeDbContext : DbContext
             .HasOne(e => e.Coffee)
             .WithMany(e => e.Brews)
             .HasForeignKey(e => e.CoffeeId);
+
+        modelBuilder.Entity<Brew>()
+            .HasMany(e => e.TastingNotes)
+            .WithMany(e => e.Brews);
     }
 
     public DbSet<Coffee> Coffees { get; set; } = null!;
