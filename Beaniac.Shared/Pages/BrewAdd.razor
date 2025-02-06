@@ -1,5 +1,5 @@
 @using System.ComponentModel.DataAnnotations
-@page "/brew/add"
+@page "/brew/add/{CoffeeId:guid}"
 @inject RestService _restService
 @inject NavigationManager _navigationManager
 
@@ -40,6 +40,14 @@
                 <FluentValidationSummary style="color:darkred" />
             </FluentEditForm>
         </FluentWizardStep>
+
+        <FluentWizardStep Label="Select Coffee" OnChange="@OnStepChange">
+            <FluentEditForm Model="Brew" FormName="CoffeeForm" OnValidSubmit="OnValidSubmit" OnInvalidSubmit="OnInvalidSubmit">
+                <DataAnnotationsValidator />
+                <FluentAutocomplete @bind-SelectedOptions="selectedCoffees" OnOptionsSearch="@(EventCallback.Factory.Create<OptionsSearchEventArgs<Coffee>>(this, OnCoffeeOptionsSearch))" OptionText="@(i => i.Name)" Label="Select Coffee" style="width: 100%;" />
+                <FluentValidationSummary style="color:darkred" />
+            </FluentEditForm>
+        </FluentWizardStep>
     </Steps>
 </FluentWizard>
 
@@ -55,6 +63,9 @@
 
 @code
 {
+    [Parameter]
+    public Guid CoffeeId { get; set; }
+
     private Brew Brew = new Brew() {Id = Guid.NewGuid()};
     private PhotoForm _photoForm = new PhotoForm();
     private bool _overlayIsVisible = false;
@@ -62,10 +73,25 @@
     private List<TastingNote> tastingNotes = new List<TastingNote>();
     private IEnumerable<TastingNote> selectedTastingNotes = new List<TastingNote>();
 
+    private List<Coffee> coffees = new List<Coffee>();
+    private IEnumerable<Coffee> selectedCoffees = new List<Coffee>();
+
     override protected async Task OnInitializedAsync() {
         var results = await _restService.GetTopAsync<TastingNote>();
         
         tastingNotes = results?.Select(x => x.Item!).ToList() ?? new List<TastingNote>();
+
+        var coffeeResults = await _restService.GetAsync<Coffee>();
+        coffees = coffeeResults ?? new List<Coffee>();
+
+        if (CoffeeId != Guid.Empty)
+        {
+            var selectedCoffee = coffees.FirstOrDefault(c => c.Id == CoffeeId);
+            if (selectedCoffee != null)
+            {
+                selectedCoffees = new List<Coffee> { selectedCoffee };
+            }
+        }
     }
 
     void OnOptionsSearch(OptionsSearchEventArgs<TastingNote> e)
@@ -83,6 +109,18 @@
         e.Items = targets;
     }
 
+    void OnCoffeeOptionsSearch(OptionsSearchEventArgs<Coffee> e)
+    {
+        var targets = coffees
+                    .Where(x => 
+                        x.Name.Contains(e.Text, StringComparison.OrdinalIgnoreCase) || 
+                        (x.Origin is string && x.Origin.Contains(e.Text, StringComparison.OrdinalIgnoreCase))
+                    )
+                    .Where(x => !selectedCoffees.Contains(x))
+                    .ToList();
+        e.Items = targets;
+    }
+
     void OnStepChange(FluentWizardStepChangeEventArgs e)
     {
         Console.WriteLine($"Go to step {e.TargetLabel} (#{e.TargetIndex})");
@@ -91,6 +129,7 @@
     async Task OnFinishedAsync()
     {
         Console.WriteLine("Finished");
+        Brew.Coffee = selectedCoffees.FirstOrDefault();
         var returnedBrew = await _restService.AddAsync(Brew);
         _navigationManager.NavigateTo($"/brew/{returnedBrew.Id}");
     }
