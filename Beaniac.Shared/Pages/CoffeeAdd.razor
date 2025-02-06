@@ -1,6 +1,7 @@
 @using System.ComponentModel.DataAnnotations
 @page "/coffee/add"
 @inject RestService _restService
+@inject NavigationManager _navigationManager
 
 <FluentWizard StepperPosition="StepperPosition.Top"
               StepSequence="@WizardStepSequence.Visited"
@@ -89,12 +90,15 @@
     async Task OnFinishedAsync()
     {
         Console.WriteLine("Finished");
-        await Task.CompletedTask;
+        var returnedCoffee = await _restService.AddAsync(Coffee);
+        _navigationManager.NavigateTo($"/coffee/{returnedCoffee.Id}");
     }
 
     async Task OnValidSubmit()
     {
         Console.WriteLine($"OnValidSubmit called");
+
+        Coffee.TastingNotes = selectedTastingNotes.ToList();
 
         _overlayIsVisible = true;
         await Task.Delay(2000);

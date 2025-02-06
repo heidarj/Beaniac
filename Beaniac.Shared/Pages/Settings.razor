@@ -1,8 +1,12 @@
 @page "/settings"
+@inject RestService RestService
 <FluentDesignTheme @bind-Mode="@Mode" StorageName="theme" />
 <PageTitle>Settings</PageTitle>
 <h3>Settings</h3>
+<div class="mb-3">
 <FluentSwitch ValueChanged="ToggleTheme" Label="Dark mode" Value=@(Mode == DesignThemeModes.Dark) />
+</div>
+<FluentButton OnClick="Seed" Appearance="Appearance.Accent">Seed</FluentButton>
 
 @code {
     DesignThemeModes Mode;
@@ -10,5 +14,10 @@
     void ToggleTheme()
     {
         Mode = Mode == DesignThemeModes.Dark ? DesignThemeModes.Light : DesignThemeModes.Dark;
+    }
+
+    void Seed()
+    {
+        RestService.Seed();
     }
 }

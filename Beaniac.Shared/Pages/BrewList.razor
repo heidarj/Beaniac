@@ -33,7 +33,7 @@
         });
 
         Brews = (await Task.WhenAll(brewTasks)).ToList();
-
+        StateHasChanged();
         return true;
     }
 }

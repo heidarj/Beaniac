@@ -65,6 +65,7 @@ else {
     async Task<bool> Refresh()
     {
         Coffee = await RestService.GetByIdAsync<Coffee>(Id, skipCache: true);
+        StateHasChanged();
         return true;
     }
 }
