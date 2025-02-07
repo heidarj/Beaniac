@@ -36,7 +36,7 @@ else {
         @if(Coffee.Brews is List<Brew>)
         {
         <h3>Brews with this coffee</h3>
-        <PullGrid TItem="Brew" Items=@Coffee.Brews?.ToList() OnRefreshAsync=@Refresh>
+        <PullGrid TItem="Brew" Items=@Coffee.Brews?.ToList() OnRefreshAsync=@Refresh AddCardHref=@($"/brew/add/{Id}")>
             <NoImageContent>
                 <FluentIcon Value="@(new Icons.Filled.Size24.DrinkCoffee())" Width="100%"/>
             </NoImageContent>

@@ -16,9 +16,11 @@
 
     <ChildContent>
         <FluentGrid Justify="JustifyContent.FlexStart" Spacing="2">
-            <FluentGridItem xs="12" sm="6" md="3" lg="2">
-                <AddCard Href=@($"/{Typename}/add") />
-            </FluentGridItem>
+            @if(ShowAddCard){
+                <FluentGridItem xs="12" sm="6" md="3" lg="2">
+                    <AddCard Href=@(string.IsNullOrEmpty(AddCardHref) ? $"/{Typename}/add" : AddCardHref) />
+                </FluentGridItem>
+            }
         @foreach (var item in Items){
             <FluentGridItem xs="12" sm="6" md="3" lg="2">
                 <DisplayCard Item=item TItem="TItem" >
@@ -48,6 +50,10 @@
     public RenderFragment<TItem> CardExtraContent { get; set; } = default!;
     [Parameter]
     public RenderFragment NoImageContent { get; set; } = default!;
+    [Parameter]
+    public bool ShowAddCard { get; set; } = true;
+    [Parameter]
+    public string? AddCardHref { get; set; }
     [Parameter]
     public List<TItem> Items { get; set; } = new List<TItem>();
     [Parameter]

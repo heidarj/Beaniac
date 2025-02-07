@@ -10,7 +10,7 @@ public class Brew : IDisplayItem
     public double? GramsIn { get; set; } // Weight of grounds in grams
     public double? CoffeeOut { get; set; } // Volume of coffee in mL
     public TimeSpan? BrewTime { get; set; } // in minutes
-    public int? Rating { get; set; } // from 0 to 5
+    public int Rating { get; set; } // from 0 to 5
     public DateTime BrewDate { get; set; }
     public string? Notes { get; set; }
     public ICollection<TastingNote>? TastingNotes { get; set; }

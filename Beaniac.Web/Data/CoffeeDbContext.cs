@@ -23,8 +23,7 @@ public class CoffeeDbContext : DbContext
             .HasForeignKey(e => e.CoffeeId);
 
         modelBuilder.Entity<Brew>()
-            .HasMany(e => e.TastingNotes)
-            .WithMany(e => e.Brews);
+            .HasMany(e => e.TastingNotes);
     }
 
     public DbSet<Coffee> Coffees { get; set; } = null!;

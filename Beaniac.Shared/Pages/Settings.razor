@@ -16,8 +16,8 @@
         Mode = Mode == DesignThemeModes.Dark ? DesignThemeModes.Light : DesignThemeModes.Dark;
     }
 
-    void Seed()
+    async Task Seed()
     {
-        RestService.Seed();
+        await RestService.Seed().ConfigureAwait(false);
     }
 }

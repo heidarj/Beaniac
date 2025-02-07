@@ -3,7 +3,7 @@
 
 <PageTitle>Brews</PageTitle>
 
-<PullGrid TItem="Brew" Items=@Brews OnRefreshAsync=@(() => RefreshBrews(true))>
+<PullGrid TItem="Brew" Items=@Brews OnRefreshAsync=@(() => RefreshBrews(true)) ShowAddCard=false>
     <NoImageContent>
         <FluentIcon Value="@(new Icons.Filled.Size24.DrinkCoffee())" Width="100%"/>
     </NoImageContent>

@@ -31,20 +31,16 @@
                     <FluentNumberField @bind-Value="Brew.GrindSize" Label="Grind Size" style="width: 100%;" />
                     <FluentNumberField @bind-Value="Brew.GramsIn" Label="Grams In" style="width: 100%;" />
                     <FluentNumberField @bind-Value="Brew.CoffeeOut" Label="Coffee Out" style="width: 100%;" />
-                    <FluentNumberField @bind-Value="Brew.BrewTime" Label="Brew Time" style="width: 100%;" />
-                    <FluentNumberField @bind-Value="Brew.Rating" Label="Rating" style="width: 100%;" />
-                    <FluentDatePicker @bind-Value="Brew.BrewDate" Label="Brew Date" style="width: 100%;" />
+                    <FluentLabel Typo="Typography.Body"> Brew time </FluentLabel>
+                    <FluentStack>
+                        <FluentNumberField @bind-Value="BrewTimeMinutes" Placeholder="MM" style="width: 100%;" />
+                        :
+                        <FluentNumberField @bind-Value="BrewTimeSeconds" Placeholder="SS" style="width: 100%;" />
+                    </FluentStack>
                     <FluentAutocomplete @bind-SelectedOptions="selectedTastingNotes"  OnOptionsSearch="@(EventCallback.Factory.Create<OptionsSearchEventArgs<TastingNote>>(this, OnOptionsSearch))" OptionText="@(i => i.Name)" Label="Tasting notes" style="width: 100%;" />
                     <FluentTextArea @bind-Value="Brew.Notes" Label="Notes" style="width: 100%;" />
+                    <FluentRating Max="5"@bind-Value="Brew.Rating" style="width: 100%;" Label="Rating"/>
                 </FluentStack>
-                <FluentValidationSummary style="color:darkred" />
-            </FluentEditForm>
-        </FluentWizardStep>
-
-        <FluentWizardStep Label="Select Coffee" OnChange="@OnStepChange">
-            <FluentEditForm Model="Brew" FormName="CoffeeForm" OnValidSubmit="OnValidSubmit" OnInvalidSubmit="OnInvalidSubmit">
-                <DataAnnotationsValidator />
-                <FluentAutocomplete @bind-SelectedOptions="selectedCoffees" OnOptionsSearch="@(EventCallback.Factory.Create<OptionsSearchEventArgs<Coffee>>(this, OnCoffeeOptionsSearch))" OptionText="@(i => i.Name)" Label="Select Coffee" style="width: 100%;" />
                 <FluentValidationSummary style="color:darkred" />
             </FluentEditForm>
         </FluentWizardStep>
@@ -70,10 +66,11 @@
     private PhotoForm _photoForm = new PhotoForm();
     private bool _overlayIsVisible = false;
 
+    int BrewTimeMinutes = 0;
+    int BrewTimeSeconds = 0;
+
     private List<TastingNote> tastingNotes = new List<TastingNote>();
     private IEnumerable<TastingNote> selectedTastingNotes = new List<TastingNote>();
-
-    private List<Coffee> coffees = new List<Coffee>();
     private IEnumerable<Coffee> selectedCoffees = new List<Coffee>();
 
     override protected async Task OnInitializedAsync() {
@@ -82,21 +79,12 @@
         tastingNotes = results?.Select(x => x.Item!).ToList() ?? new List<TastingNote>();
 
         var coffeeResults = await _restService.GetAsync<Coffee>();
-        coffees = coffeeResults ?? new List<Coffee>();
 
-        if (CoffeeId != Guid.Empty)
-        {
-            var selectedCoffee = coffees.FirstOrDefault(c => c.Id == CoffeeId);
-            if (selectedCoffee != null)
-            {
-                selectedCoffees = new List<Coffee> { selectedCoffee };
-            }
-        }
+        Brew.CoffeeId = CoffeeId;
     }
 
     void OnOptionsSearch(OptionsSearchEventArgs<TastingNote> e)
     {
-        
         var targets = tastingNotes
                     .Where(x => 
                         x.Name.Contains(e.Text, StringComparison.OrdinalIgnoreCase) || 
@@ -109,18 +97,6 @@
         e.Items = targets;
     }
 
-    void OnCoffeeOptionsSearch(OptionsSearchEventArgs<Coffee> e)
-    {
-        var targets = coffees
-                    .Where(x => 
-                        x.Name.Contains(e.Text, StringComparison.OrdinalIgnoreCase) || 
-                        (x.Origin is string && x.Origin.Contains(e.Text, StringComparison.OrdinalIgnoreCase))
-                    )
-                    .Where(x => !selectedCoffees.Contains(x))
-                    .ToList();
-        e.Items = targets;
-    }
-
     void OnStepChange(FluentWizardStepChangeEventArgs e)
     {
         Console.WriteLine($"Go to step {e.TargetLabel} (#{e.TargetIndex})");
@@ -129,7 +105,6 @@
     async Task OnFinishedAsync()
     {
         Console.WriteLine("Finished");
-        Brew.Coffee = selectedCoffees.FirstOrDefault();
         var returnedBrew = await _restService.AddAsync(Brew);
         _navigationManager.NavigateTo($"/brew/{returnedBrew.Id}");
     }
@@ -139,6 +114,8 @@
         Console.WriteLine($"OnValidSubmit called");
 
         Brew.TastingNotes = selectedTastingNotes.ToList();
+        Brew.BrewDate = DateTime.UtcNow;
+        Brew.BrewTime = new TimeSpan(0, BrewTimeMinutes, BrewTimeSeconds);
 
         _overlayIsVisible = true;
         await Task.Delay(2000);
